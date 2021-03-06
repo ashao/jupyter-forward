@@ -4,6 +4,7 @@ import socket
 import sys
 import time
 from dataclasses import dataclass
+from warnings import warn
 
 import invoke
 import paramiko
@@ -48,8 +49,15 @@ class RemoteRunner:
     launch_command: str = None
     identity: str = None
     shell: str = '/usr/bin/env bash'
+    jupyter_path: str = None
 
     def __post_init__(self):
+        if self.jupyter_path and self.conda_env:
+            warn(
+               f'Both jupyter_path ({jupyter_path}) and conda_env ({conda_env}) '\
+               f'were defined. Some python packages may not be available.'
+            )
+
         self.run_kwargs = dict(pty=True)
         console.rule('[bold green]Authentication', characters='*')
         if self.port_forwarding and not is_port_available(self.port):
@@ -147,6 +155,8 @@ class RemoteRunner:
                 check_jupyter_status = (
                     f'conda activate {self.conda_env} && sh -c "command -v jupyter"'
                 )
+            check_jupyter_status = f'sh -c "command -v {self.jupyter_path}'
+
             self._jupyter_info(check_jupyter_status)
             if self.envvar_exists('TMPDIR') and self.dir_exists('$TMPDIR'):
                 self.log_dir = '$TMPDIR'

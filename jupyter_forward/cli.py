@@ -67,6 +67,12 @@ def start(
         show_default=True,
         help='Which remote shell binary to use.',
     ),
+    jupyter_path: str = typer.Option(
+        None,
+        '--jupyter_path',
+        show_default = True,
+        help = 'If defined, specify the path to jupyter on the remote machine, otherwise try to infer its location'
+    ),
     version: Optional[bool] = typer.Option(
         None,
         '--version',
@@ -89,6 +95,7 @@ def start(
         launch_command=launch_command,
         identity=identity,
         shell=shell,
+        jupyter_path=jupyter_path
     )
     runner.start()
 
